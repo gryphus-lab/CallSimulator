@@ -15,6 +15,10 @@ concurrency:
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
+    env:
+      # Promoted to job level so step `if:` conditions can test for its presence.
+      # Empty on Dependabot / fork PRs (GitHub withholds secrets there).
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     steps:
       - name: Checkout
@@ -43,9 +47,14 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
+      # SonarCloud needs SONAR_TOKEN, which GitHub does NOT expose to
+      # pull_request runs triggered by Dependabot (or forks). Skip the scan when
+      # the token is absent so those PRs aren't failed by an auth error; it still
+      # runs on pushes to main and on internal branch PRs. (The `build` + tests
+      # above already validate the change; `sonar` triggers its own build/coverage
+      # dependencies when it runs.)
       - name: SonarQube Scan
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: ${{ env.SONAR_TOKEN != '' }}
         run: ./gradlew build sonar --info
 
       - name: Assemble debug build
