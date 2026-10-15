@@ -1,4 +1,4 @@
-package com.example.callsimulator
+package ch.gryphus.callsimulator
 
 /**
  * Framework-free caller details and the pure helpers that derive them.

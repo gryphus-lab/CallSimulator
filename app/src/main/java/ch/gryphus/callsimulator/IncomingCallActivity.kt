@@ -1,4 +1,4 @@
-package com.example.callsimulator
+package ch.gryphus.callsimulator
 
 import android.content.Intent
 import android.media.AudioAttributes
@@ -10,7 +10,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.widget.ImageView
-import com.example.callsimulator.databinding.ActivityIncomingCallBinding
+import ch.gryphus.callsimulator.databinding.ActivityIncomingCallBinding
 
 class IncomingCallActivity : BaseCallActivity() {
 

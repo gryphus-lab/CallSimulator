@@ -1,4 +1,4 @@
-package com.example.callsimulator
+package ch.gryphus.callsimulator
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

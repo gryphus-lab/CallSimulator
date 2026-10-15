@@ -51,7 +51,7 @@ run = "$ANDROID_HOME/platform-tools/adb devices"
 
 [tasks.uninstall-debug]
 description = "Uninstall the app from the connected device"
-run = "$ANDROID_HOME/platform-tools/adb uninstall com.example.callsimulator"
+run = "$ANDROID_HOME/platform-tools/adb uninstall ch.gryphus.callsimulator"
 
 [tasks.clean]
 description = "Gradle clean"
