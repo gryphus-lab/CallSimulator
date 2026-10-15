@@ -21,7 +21,7 @@ jobs:
 
       - name: Set up mise
         uses: jdx/mise-action@e6a8b3978addb5a52f2b4cd9d91eafa7f0ab959d
-      - name: Build project
+      - name: Assemble debug build
         run: mise run assemble-debug
       - name: Run tests
         run: mise run test
