@@ -5,6 +5,13 @@ plugins {
     id("org.sonarqube") version "7.5.0.8588"
 }
 
+// Ensure the JaCoCo unit-test coverage report is generated before the scan.
+// CI runs `./gradlew build sonar`, and `build` does not trigger the Android
+// unit-test coverage report task, so without this the scan sees no coverage.
+tasks.named("sonar") {
+    dependsOn(":app:createDebugUnitTestCoverageReport")
+}
+
 sonar {
   properties {
     property("sonar.projectKey", "gryphus-lab_CallSimulator")
