@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- API 27+ only: draw the full-screen call UI into the display cutout.
+         Kept out of values/themes.xml so it doesn't trip the NewApi lint check
+         against the minSdk of 26. -->
+    <style name="Theme.CallSimulator.FullScreen" parent="Theme.CallSimulator">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

@@ -50,3 +50,6 @@ yarn-error.*
 
 # gradle
 .gradle/
+
+# Machine-specific Android SDK path - must not be committed
+local.properties

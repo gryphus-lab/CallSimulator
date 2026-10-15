@@ -12,7 +12,7 @@
 
     <style name="Theme.CallSimulator.FullScreen" parent="Theme.CallSimulator">
         <item name="android:windowFullscreen">true</item>
-        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <!-- windowLayoutInDisplayCutoutMode requires API 27; set in values-v27. -->
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
