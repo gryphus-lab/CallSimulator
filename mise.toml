@@ -52,6 +52,14 @@ run = "$ANDROID_HOME/platform-tools/adb uninstall com.example.callsimulator"
 description = "Gradle clean"
 run = "./gradlew clean"
 
+[tasks.check]
+description = "Run checkstyle"
+run = "./gradlew check"
+
+[tasks.build]
+description = "Build the project"
+run = "./gradlew build"
+
 [tasks.test]
 description = "Run tests"
 run = "./gradlew test"
