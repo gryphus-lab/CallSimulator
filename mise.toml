@@ -1,0 +1,53 @@
+# Toolchain for CallSimulator (Android app, built with the Android Gradle Plugin).
+#
+# AGP 9.x + compileSdk 35 require JDK 17 (your machine's default is newer, which
+# AGP rejects). Pinning it here makes mise set JAVA_HOME to a temurin-17 install
+# whenever you enter this directory, so `./gradlew assembleDebug` just works -
+# no need to export JAVA_HOME by hand.
+#
+# Run `mise install` once to provision the JDK, then `mise trust` to allow this
+# config. The Android SDK itself is not managed by mise (it lives at the
+# sdk.dir in local.properties and is provisioned via Android Studio / sdkmanager).
+
+[tools]
+java = "temurin-17"
+
+[env]
+# Android SDK location (same as sdk.dir in local.properties). Used by the adb
+# helper tasks below. Adjust if your SDK lives elsewhere.
+ANDROID_HOME = "{{ env.HOME }}/Library/Android/sdk"
+
+[tasks.assemble-debug]
+description = "Build the debug APK (app/build/outputs/apk/debug/app-debug.apk)"
+run = [
+  "./gradlew assembleDebug",
+  "echo 'APK: app/build/outputs/apk/debug/app-debug.apk'",
+]
+
+[tasks.install-debug]
+description = "Build + install the debug APK on the connected device (needs USB debugging)"
+run = '''
+adb="$ANDROID_HOME/platform-tools/adb"
+# Count attached devices/emulators that are in the 'device' state (ready).
+count=$("$adb" devices | awk 'NR>1 && $2=="device"' | wc -l | tr -d ' ')
+if [ "$count" -eq 0 ]; then
+  echo "No Android device/emulator is connected and ready." >&2
+  echo "  1. Enable Developer options + USB debugging on the phone." >&2
+  echo "  2. Connect via USB and accept the 'Allow USB debugging?' prompt." >&2
+  echo "  3. Verify with: mise run devices   (status should be 'device', not 'unauthorized' or 'offline')" >&2
+  exit 1
+fi
+./gradlew installDebug
+'''
+
+[tasks.devices]
+description = "List connected Android devices (adb)"
+run = "$ANDROID_HOME/platform-tools/adb devices"
+
+[tasks.uninstall-debug]
+description = "Uninstall the app from the connected device"
+run = "$ANDROID_HOME/platform-tools/adb uninstall com.example.callsimulator"
+
+[tasks.clean]
+description = "Gradle clean"
+run = "./gradlew clean"

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Call Simulator</string>
+    <string name="incoming_call">Incoming Call</string>
+    <string name="answer">Answer</string>
+    <string name="decline">Decline</string>
+    <string name="end_call">End Call</string>
+    <string name="mute">Mute</string>
+    <string name="speaker">Speaker</string>
+    <string name="keypad">Keypad</string>
+    <string name="start_simulation">Start Incoming Call</string>
+    <string name="caller_name_hint">Caller Name</string>
+    <string name="caller_number_hint">Phone Number</string>
+    <string name="default_caller_name">Mom</string>
+    <string name="default_caller_number">+1 555-0123</string>
+    <string name="calling">Calling…</string>
+    <string name="call_ended">Call Ended</string>
+    <string name="simulate_outgoing">Simulate Outgoing Call</string>
+    <string name="notification_channel_name">Call Simulation</string>
+    <string name="notification_channel_desc">Notifications for simulated calls</string>
+    <string name="ongoing_call">Ongoing simulated call</string>
+    <string name="pick_photo">Pick Photo</string>
+    <string name="pick_contact">Pick Contact</string>
+    <string name="clear_photo">Clear</string>
+    <string name="caller_photo">Caller photo</string>
+    <string name="contacts_permission_denied">Contacts permission is needed to use a contact\'s photo and number.</string>
+</resources>

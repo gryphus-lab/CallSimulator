@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.CallSimulator" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/call_green</item>
+        <item name="colorPrimaryContainer">@color/accent_blue</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/call_red</item>
+        <item name="android:statusBarColor">@color/call_background</item>
+        <item name="android:navigationBarColor">@color/call_background</item>
+        <item name="android:windowBackground">@color/call_background</item>
+    </style>
+
+    <style name="Theme.CallSimulator.FullScreen" parent="Theme.CallSimulator">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>
