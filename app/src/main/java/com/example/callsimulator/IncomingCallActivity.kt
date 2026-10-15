@@ -2,22 +2,17 @@ package com.example.callsimulator
 
 import android.content.Intent
 import android.media.AudioAttributes
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.view.View
-import android.view.WindowManager
-import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.ImageView
 import com.example.callsimulator.databinding.ActivityIncomingCallBinding
 
-class IncomingCallActivity : AppCompatActivity() {
+class IncomingCallActivity : BaseCallActivity() {
 
     companion object {
         const val EXTRA_CALLER_NAME = "extra_caller_name"
@@ -29,21 +24,13 @@ class IncomingCallActivity : AppCompatActivity() {
     private var mediaPlayer: MediaPlayer? = null
     private var vibrator: Vibrator? = null
 
+    override val avatarView: ImageView get() = binding.callerAvatar
+    override val photoBackgroundView: ImageView get() = binding.callerPhotoBackground
+    override val photoScrimView: android.view.View get() = binding.photoScrim
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Full screen + show over lock screen
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            setShowWhenLocked(true)
-            setTurnScreenOn(true)
-        }
-        window.addFlags(
-            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
+        applyCallWindowFlags()
 
         binding = ActivityIncomingCallBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -82,28 +69,8 @@ class IncomingCallActivity : AppCompatActivity() {
 
         startRingtoneAndVibrate()
 
-        // Block the back button during an incoming call - the user must answer or
-        // decline. Registered via the dispatcher (onBackPressed() is deprecated).
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                // Intentionally no-op.
-            }
-        })
-    }
-
-    /** Show the chosen caller photo in the avatar circle and as a full-screen backdrop. */
-    private fun applyCallerPhoto(photo: String?) {
-        if (photo.isNullOrBlank()) return
-        val uri = runCatching { Uri.parse(photo) }.getOrNull() ?: return
-        runCatching {
-            binding.callerAvatar.setImageURI(uri)
-            binding.callerPhotoBackground.setImageURI(uri)
-            // Only reveal the backdrop + scrim if the image actually loaded.
-            if (binding.callerPhotoBackground.drawable != null) {
-                binding.callerPhotoBackground.visibility = View.VISIBLE
-                binding.photoScrim.visibility = View.VISIBLE
-            }
-        }
+        // Block the back button during an incoming call - answer or decline only.
+        blockBackButton()
     }
 
     private fun startRingtoneAndVibrate() {

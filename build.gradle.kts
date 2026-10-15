@@ -9,5 +9,26 @@ sonar {
   properties {
     property("sonar.projectKey", "gryphus-lab_CallSimulator")
     property("sonar.organization", "gryphus-lab")
+
+    // JaCoCo XML from the debug unit-test coverage report (AGP enableUnitTestCoverage).
+    property(
+      "sonar.coverage.jacoco.xmlReportPaths",
+      "${project.rootDir}/app/build/reports/coverage/test/debug/report.xml"
+    )
+
+    // Exclude code that is UI plumbing / generated and not meaningfully unit-testable
+    // on the JVM, so the coverage metric reflects the logic we actually test.
+    property(
+      "sonar.coverage.exclusions",
+      listOf(
+        "**/MainActivity.kt",
+        "**/IncomingCallActivity.kt",
+        "**/InCallActivity.kt",
+        "**/BaseCallActivity.kt",
+        "**/CallSimulationService.kt",
+        "**/databinding/**",
+        "**/*_ViewBinding*",
+      ).joinToString(",")
+    )
   }
 }
