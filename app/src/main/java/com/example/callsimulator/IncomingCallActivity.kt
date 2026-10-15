@@ -13,6 +13,7 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.callsimulator.databinding.ActivityIncomingCallBinding
 
@@ -80,6 +81,14 @@ class IncomingCallActivity : AppCompatActivity() {
         }
 
         startRingtoneAndVibrate()
+
+        // Block the back button during an incoming call - the user must answer or
+        // decline. Registered via the dispatcher (onBackPressed() is deprecated).
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // Intentionally no-op.
+            }
+        })
     }
 
     /** Show the chosen caller photo in the avatar circle and as a full-screen backdrop. */
@@ -147,11 +156,5 @@ class IncomingCallActivity : AppCompatActivity() {
     override fun onDestroy() {
         stopRingtoneAndVibrate()
         super.onDestroy()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        // Prevent accidental back during incoming call simulation
-        // User must decline or answer
     }
 }

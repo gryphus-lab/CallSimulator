@@ -8,6 +8,7 @@ import android.os.Looper
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.callsimulator.databinding.ActivityInCallBinding
 
@@ -105,6 +106,14 @@ class InCallActivity : AppCompatActivity() {
         binding.keypadButton.setOnClickListener {
             Toast.makeText(this, "Keypad (simulated)", Toast.LENGTH_SHORT).show()
         }
+
+        // Block the back button during a call - the user must use "End Call".
+        // Registered via the dispatcher (the onBackPressed() override is deprecated).
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // Intentionally no-op.
+            }
+        })
     }
 
     /** Show the chosen caller photo in the avatar circle and as a full-screen backdrop. */
@@ -130,10 +139,5 @@ class InCallActivity : AppCompatActivity() {
     override fun onDestroy() {
         handler.removeCallbacks(timerRunnable)
         super.onDestroy()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        // Require using End Call button
     }
 }
