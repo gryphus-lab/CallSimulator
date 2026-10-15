@@ -1,4 +1,4 @@
-package com.example.callsimulator
+package ch.gryphus.callsimulator
 
 import android.os.Build
 import android.os.Bundle
@@ -6,7 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.ImageView
 import android.widget.Toast
-import com.example.callsimulator.databinding.ActivityInCallBinding
+import ch.gryphus.callsimulator.databinding.ActivityInCallBinding
 
 class InCallActivity : BaseCallActivity() {
 

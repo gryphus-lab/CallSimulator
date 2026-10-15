@@ -1,4 +1,4 @@
-package com.example.callsimulator
+package ch.gryphus.callsimulator
 
 import android.Manifest
 import android.content.Intent
@@ -13,7 +13,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.callsimulator.databinding.ActivityMainBinding
+import ch.gryphus.callsimulator.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

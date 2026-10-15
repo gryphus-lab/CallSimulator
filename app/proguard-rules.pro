@@ -6,4 +6,4 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Keep everything for this simple personal app
--keep class com.example.callsimulator.** { *; }
+-keep class ch.gryphus.callsimulator.** { *; }

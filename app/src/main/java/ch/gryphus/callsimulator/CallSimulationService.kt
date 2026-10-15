@@ -1,4 +1,4 @@
-package com.example.callsimulator
+package ch.gryphus.callsimulator
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -14,7 +14,7 @@ class CallSimulationService : Service() {
     companion object {
         const val CHANNEL_ID = "call_simulation_channel"
         const val NOTIFICATION_ID = 1001
-        const val ACTION_INCOMING = "com.example.callsimulator.ACTION_INCOMING"
+        const val ACTION_INCOMING = "ch.gryphus.callsimulator.ACTION_INCOMING"
         const val EXTRA_CALLER_NAME = "extra_caller_name"
         const val EXTRA_CALLER_NUMBER = "extra_caller_number"
         const val EXTRA_CALLER_PHOTO = "extra_caller_photo"
