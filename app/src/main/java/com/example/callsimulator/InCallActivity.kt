@@ -28,12 +28,11 @@ class InCallActivity : BaseCallActivity() {
     override val photoBackgroundView: ImageView get() = binding.callerPhotoBackground
     override val photoScrimView: android.view.View get() = binding.photoScrim
 
-    private val timerRunnable = object : Runnable {
-        override fun run() {
-            seconds++
-            binding.callStatusText.text = CallTimer.format(seconds)
-            handler.postDelayed(this, 1000)
-        }
+    // Explicit type so the lambda body can reference timerRunnable for re-post.
+    private val timerRunnable: Runnable = Runnable {
+        seconds++
+        binding.callStatusText.text = CallTimer.format(seconds)
+        handler.postDelayed(timerRunnable, 1000)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

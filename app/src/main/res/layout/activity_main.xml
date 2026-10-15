@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/call_background"
     android:padding="24dp"
     tools:context=".MainActivity">
 
@@ -27,7 +26,7 @@
         android:id="@+id/subtitleText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Full-screen Caller ID"
+        android:text="@string/main_subtitle"
         android:textColor="@color/text_secondary"
         android:textSize="14sp"
         android:gravity="center"
@@ -166,7 +165,7 @@
         android:id="@+id/hintText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Tip: Grant notification &amp; full-screen intent permissions for best results. This app is for personal use only."
+        android:text="@string/main_hint"
         android:textColor="@color/text_secondary"
         android:textSize="12sp"
         android:gravity="center"
