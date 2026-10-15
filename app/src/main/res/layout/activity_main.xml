@@ -27,7 +27,7 @@
         android:id="@+id/subtitleText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Personal full-screen call simulator"
+        android:text="Full-screen Caller ID"
         android:textColor="@color/text_secondary"
         android:textSize="14sp"
         android:gravity="center"
