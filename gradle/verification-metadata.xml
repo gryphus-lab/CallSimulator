@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <verification-metadata xmlns="https://schema.gradle.org/dependency-verification" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://schema.gradle.org/dependency-verification https://schema.gradle.org/dependency-verification/dependency-verification-1.4.xsd">
    <configuration>
-      <!-- Checksums recorded for reproducibility and supply-chain transparency.
-           Enforcement is off (verify-metadata=false) because CI runners resolve
-           some OS/arch-specific artifacts absent on the machine that generated
-           this file, and the project takes frequent dependency bumps; strict
-           enforcement would break those builds until regenerated. Re-run
-           ./gradlew write-verification-metadata sha256 build to refresh, and set
-           verify-metadata to true to enforce. -->
-      <verify-metadata>false</verify-metadata>
+      <!-- sha256 checksums recorded for reproducibility and supply-chain
+           transparency. Regenerate after dependency bumps with:
+           ./gradlew write-verification-metadata sha256 build -->
+      <verify-metadata>true</verify-metadata>
       <verify-signatures>false</verify-signatures>
+      <!-- aapt2 ships a different native binary per OS/arch (linux/osx/windows).
+           This file is generated on one platform, so trust the Google-published
+           aapt2 binaries by name instead of pinning a single platform's jar -
+           otherwise the Linux CI runner fails on the -linux variant. -->
+      <trusted-artifacts>
+         <trust group="com.android.tools.build" name="aapt2"
+                file=".*-(linux|osx|windows)[.]jar" regex="true"/>
+      </trusted-artifacts>
    </configuration>
    <components>
       <component group="androidx.activity" name="activity" version="1.8.0">
