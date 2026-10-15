@@ -101,13 +101,9 @@ class IncomingCallActivity : BaseCallActivity() {
         }
 
         vibrator?.let { vib ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val pattern = longArrayOf(0, 1000, 1000)
-                vib.vibrate(VibrationEffect.createWaveform(pattern, 0))
-            } else {
-                @Suppress("DEPRECATION")
-                vib.vibrate(longArrayOf(0, 1000, 1000), 0)
-            }
+            // minSdk 26 (>= O), so VibrationEffect is always available.
+            val pattern = longArrayOf(0, 1000, 1000)
+            vib.vibrate(VibrationEffect.createWaveform(pattern, 0))
         }
     }
 

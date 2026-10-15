@@ -1,11 +1,11 @@
 package com.example.callsimulator
 
-import android.net.Uri
 import android.os.Build
 import android.view.WindowManager
 import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 
 /**
  * Shared behaviour for the two full-screen call activities
@@ -47,7 +47,7 @@ abstract class BaseCallActivity : AppCompatActivity() {
     /** Show the chosen caller photo in the avatar and as a full-screen backdrop. */
     protected fun applyCallerPhoto(photo: String?) {
         if (photo.isNullOrBlank()) return
-        val uri = runCatching { Uri.parse(photo) }.getOrNull() ?: return
+        val uri = runCatching { photo.toUri() }.getOrNull() ?: return
         runCatching {
             avatarView.setImageURI(uri)
             photoBackgroundView.setImageURI(uri)
