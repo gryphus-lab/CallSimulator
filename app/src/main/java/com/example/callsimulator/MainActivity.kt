@@ -131,17 +131,25 @@ class MainActivity : AppCompatActivity() {
                 val contactId = cursor.getLong(
                     cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID)
                 )
-                val name = cursor.getStringOrNull(ContactsContract.Contacts.DISPLAY_NAME)
-                val photo = cursor.getStringOrNull(ContactsContract.Contacts.PHOTO_URI)
-                val hasPhone = cursor.getIntOrNull(
+                val rawName = cursor.getStringOrNull(ContactsContract.Contacts.DISPLAY_NAME)
+                val rawPhoto = cursor.getStringOrNull(ContactsContract.Contacts.PHOTO_URI)
+                val hasPhoneFlag = cursor.getIntOrNull(
                     ContactsContract.Contacts.HAS_PHONE_NUMBER
-                ) ?: 0
+                )
+                val primaryNumber =
+                    if (CallerDetails.hasPhoneNumber(hasPhoneFlag)) queryPrimaryNumber(contactId)
+                    else null
 
-                if (!name.isNullOrBlank()) binding.callerNameEdit.setText(name)
-                if (hasPhone > 0) queryPrimaryNumber(contactId)?.let {
-                    binding.callerNumberEdit.setText(it)
-                }
-                setCallerPhoto(photo?.let(Uri::parse))
+                // All decisions live in the pure CallerDetails helper (unit-tested).
+                val fields = CallerDetails.fieldsFromContact(
+                    displayName = rawName,
+                    hasPhoneFlag = hasPhoneFlag,
+                    primaryNumber = primaryNumber,
+                    rawPhotoUri = rawPhoto,
+                )
+                fields.name?.let { binding.callerNameEdit.setText(it) }
+                fields.number?.let { binding.callerNumberEdit.setText(it) }
+                setCallerPhoto(fields.photo?.let(Uri::parse))
             }
         } catch (e: SecurityException) {
             Toast.makeText(
@@ -177,12 +185,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun resolvedName(): String =
-        binding.callerNameEdit.text?.toString()?.trim().orEmpty()
-            .ifEmpty { getString(R.string.default_caller_name) }
+        CallerDetails.resolveName(
+            binding.callerNameEdit.text?.toString(),
+            getString(R.string.default_caller_name)
+        )
 
     private fun resolvedNumber(): String =
-        binding.callerNumberEdit.text?.toString()?.trim().orEmpty()
-            .ifEmpty { getString(R.string.default_caller_number) }
+        CallerDetails.resolveNumber(
+            binding.callerNumberEdit.text?.toString(),
+            getString(R.string.default_caller_number)
+        )
 
     private fun startIncomingCall() {
         val name = resolvedName()

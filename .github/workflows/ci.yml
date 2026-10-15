@@ -2,13 +2,16 @@ name: CI — Tests & SonarQube Scan
 
 on:
   push:
-    branches: [main, feature/**]
+    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
@@ -21,8 +24,11 @@ jobs:
 
       - name: Set up mise
         uses: jdx/mise-action@e6a8b3978addb5a52f2b4cd9d91eafa7f0ab959d
-      - name: Assemble debug build
-        run: mise run assemble-debug
+     
+      - name: Run checkstyle
+        run: mise run check
+      - name: Build project
+        run: mise run build
       - name: Run tests
         run: mise run test
       - name: Cache SonarQube packages
@@ -37,7 +43,10 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
-      - name: Build and analyze
+      - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonar --info
+
+      - name: Assemble debug build
+        run: mise run assemble-debug
