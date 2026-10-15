@@ -9,11 +9,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+# Minimal default for the workflow; the write permissions needed to deploy to
+# GitHub Pages are granted at the job level (deploy) instead of workflow-wide.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
@@ -40,6 +39,10 @@ jobs:
 
   # Deployment job
   deploy:
+    # Pages deployment needs these write scopes; granted here, not workflow-wide.
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

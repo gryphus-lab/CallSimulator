@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/call_background"
     android:fitsSystemWindows="false"
     tools:context=".InCallActivity">
 
@@ -38,7 +37,7 @@
         android:id="@+id/callStatusText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="00:00"
+        android:text="@string/call_timer_initial"
         android:textColor="@color/text_secondary"
         android:textSize="16sp"
         app:layout_constraintTop_toTopOf="parent"
@@ -95,6 +94,7 @@
         android:id="@+id/controlsRow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         android:orientation="horizontal"
         android:gravity="center"
         android:weightSum="3"

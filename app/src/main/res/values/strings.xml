@@ -18,10 +18,12 @@
     <string name="simulate_outgoing">Make Outgoing Call</string>
     <string name="notification_channel_name">Call Simulation</string>
     <string name="notification_channel_desc">Notifications for calls</string>
-    <string name="ongoing_call">Ongoing call</string>
     <string name="pick_photo">Pick Photo</string>
     <string name="pick_contact">Pick Contact</string>
     <string name="clear_photo">Clear</string>
     <string name="caller_photo">Caller photo</string>
     <string name="contacts_permission_denied">Contacts permission is needed to use a contact\'s photo and number.</string>
+    <string name="main_subtitle">Full-screen Caller ID</string>
+    <string name="main_hint">Tip: Grant notification &amp; full-screen intent permissions for best results. This app is for personal use only.</string>
+    <string name="call_timer_initial">00:00</string>
 </resources>
