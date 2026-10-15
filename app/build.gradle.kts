@@ -5,12 +5,13 @@ plugins {
 
 android {
     namespace = "com.example.callsimulator"
-    compileSdk = 35
+    // core-ktx 1.19.x requires compiling against API 37+ (AAR metadata check).
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.example.callsimulator"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
