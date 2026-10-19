@@ -77,10 +77,15 @@
             android:name=".CallAlarmReceiver"
             android:exported="false" />
 
-        <!-- Re-arms a pending scheduled call after a reboot. -->
+        <!-- Re-arms a pending scheduled call after a reboot. BOOT_COMPLETED is a
+             protected broadcast (only the OS can send it); requiring the sender
+             to hold RECEIVE_BOOT_COMPLETED additionally guarantees no other app
+             can trigger this receiver, so the exported filter is safe. The
+             receiver also strictly validates the action in onReceive. -->
         <receiver
             android:name=".BootReceiver"
-            android:exported="true">
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
