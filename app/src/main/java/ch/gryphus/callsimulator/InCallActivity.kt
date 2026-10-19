@@ -65,11 +65,11 @@ class InCallActivity : BaseCallActivity() {
     }
 
     // Drives the on-screen duration from the service's authoritative start time.
-    private val tick: Runnable = object : Runnable {
-        override fun run() {
-            renderDuration()
-            handler.postDelayed(this, 1000)
-        }
+    // Re-posts itself by referencing the `tick` val (initialised below), so the
+    // SAM can stay a lambda rather than an explicit Runnable object (S6516).
+    private val tick: Runnable = Runnable {
+        renderDuration()
+        handler.postDelayed(tick, 1000)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
