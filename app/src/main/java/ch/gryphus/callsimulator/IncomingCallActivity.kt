@@ -10,6 +10,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import ch.gryphus.callsimulator.databinding.ActivityIncomingCallBinding
 
 class IncomingCallActivity : BaseCallActivity() {
@@ -47,8 +48,18 @@ class IncomingCallActivity : BaseCallActivity() {
 
         binding.answerButton.setOnClickListener {
             stopRingtoneAndVibrate()
-            // Stop the service notification
-            stopService(Intent(this, CallSimulationService::class.java))
+
+            // Transition the SAME foreground service from ringing to an active
+            // call (don't stop it), so the call now lives in the service and
+            // survives the UI being backgrounded.
+            val ongoing = Intent(this, CallSimulationService::class.java).apply {
+                action = CallSimulationService.ACTION_ONGOING
+                putExtra(CallSimulationService.EXTRA_CALLER_NAME, name)
+                putExtra(CallSimulationService.EXTRA_CALLER_NUMBER, number)
+                putExtra(CallSimulationService.EXTRA_CALLER_PHOTO, photo)
+                putExtra(CallSimulationService.EXTRA_IS_OUTGOING, false)
+            }
+            ContextCompat.startForegroundService(this, ongoing)
 
             val inCallIntent = Intent(this, InCallActivity::class.java).apply {
                 putExtra(InCallActivity.EXTRA_CALLER_NAME, name)

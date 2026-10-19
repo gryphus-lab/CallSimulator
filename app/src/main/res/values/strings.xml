@@ -18,6 +18,8 @@
     <string name="simulate_outgoing">Make Outgoing Call</string>
     <string name="notification_channel_name">Call Simulation</string>
     <string name="notification_channel_desc">Notifications for calls</string>
+    <string name="ongoing_channel_name">Ongoing Call</string>
+    <string name="ongoing_channel_desc">Persistent notification shown during an active call</string>
     <string name="pick_photo">Pick Photo</string>
     <string name="pick_contact">Pick Contact</string>
     <string name="clear_photo">Clear</string>
