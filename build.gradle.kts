@@ -32,6 +32,12 @@ sonar {
         "**/InCallActivity.kt",
         "**/BaseCallActivity.kt",
         "**/CallSimulationService.kt",
+        // Android-framework glue for scheduling: AlarmManager / PendingIntent /
+        // SharedPreferences wrapper and BroadcastReceivers. The decision logic
+        // is extracted into CallSchedule.kt, which IS unit-tested and measured.
+        "**/CallScheduler.kt",
+        "**/CallAlarmReceiver.kt",
+        "**/BootReceiver.kt",
         "**/databinding/**",
         "**/*_ViewBinding*",
       ).joinToString(",")
