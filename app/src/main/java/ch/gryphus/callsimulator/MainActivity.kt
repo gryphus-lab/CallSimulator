@@ -14,6 +14,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import ch.gryphus.callsimulator.databinding.ActivityMainBinding
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
+import java.text.DateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.TimeZone
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,6 +28,9 @@ class MainActivity : AppCompatActivity() {
 
     /** Currently selected caller photo (gallery or contact), or null for the default avatar. */
     private var callerPhotoUri: Uri? = null
+
+    /** Arms/cancels a future simulated call via AlarmManager. */
+    private val scheduler by lazy { CallScheduler(this) }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -88,6 +98,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.startIncomingButton.setOnClickListener { startIncomingCall() }
         binding.startOutgoingButton.setOnClickListener { startOutgoingCall() }
+
+        binding.scheduleCallButton.setOnClickListener { pickScheduleDateTime() }
+        binding.cancelScheduleButton.setOnClickListener { cancelSchedule() }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshScheduleStatus()
     }
 
     private fun requestNeededPermissions() {
@@ -232,6 +250,97 @@ class MainActivity : AppCompatActivity() {
             setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
         startActivity(intent)
+    }
+
+    // ---- Schedule a future call -------------------------------------------
+
+    /** Date picker -> time picker -> arm the alarm for the chosen moment. */
+    private fun pickScheduleDateTime() {
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(R.string.pick_date_title)
+            .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+            .build()
+
+        datePicker.addOnPositiveButtonClickListener { utcDateMillis ->
+            val now = Calendar.getInstance()
+            val timePicker = MaterialTimePicker.Builder()
+                .setTitleText(R.string.pick_time_title)
+                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .setHour(now.get(Calendar.HOUR_OF_DAY))
+                .setMinute(now.get(Calendar.MINUTE))
+                .build()
+
+            timePicker.addOnPositiveButtonClickListener {
+                armScheduleAt(utcDateMillis, timePicker.hour, timePicker.minute)
+            }
+            timePicker.show(supportFragmentManager, "schedule_time")
+        }
+        datePicker.show(supportFragmentManager, "schedule_date")
+    }
+
+    /**
+     * Combine the UTC-midnight date from the date picker with the local
+     * hour/minute into an absolute local trigger time, then arm it.
+     */
+    private fun armScheduleAt(utcDateMillis: Long, hour: Int, minute: Int) {
+        // MaterialDatePicker returns UTC midnight; read its Y/M/D in UTC, then
+        // rebuild the instant in the device's local zone with the chosen time.
+        val utc = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+            timeInMillis = utcDateMillis
+        }
+        val local = Calendar.getInstance().apply {
+            clear()
+            set(
+                utc.get(Calendar.YEAR),
+                utc.get(Calendar.MONTH),
+                utc.get(Calendar.DAY_OF_MONTH),
+                hour,
+                minute,
+                0
+            )
+        }
+        val triggerAt = local.timeInMillis
+        val now = System.currentTimeMillis()
+
+        if (!CallSchedule.isInFuture(triggerAt, now)) {
+            Toast.makeText(this, getString(R.string.schedule_in_past), Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val call = ScheduledCall(
+            name = resolvedName(),
+            number = resolvedNumber(),
+            photo = callerPhotoUri?.toString(),
+            triggerAtMillis = triggerAt,
+        )
+        scheduler.schedule(call)
+
+        val lead = CallSchedule.formatLeadTime(triggerAt, now)
+        Toast.makeText(this, getString(R.string.schedule_set, lead), Toast.LENGTH_LONG).show()
+        refreshScheduleStatus()
+    }
+
+    private fun cancelSchedule() {
+        scheduler.cancel()
+        Toast.makeText(this, getString(R.string.schedule_canceled), Toast.LENGTH_SHORT).show()
+        refreshScheduleStatus()
+    }
+
+    /** Reflect any pending schedule in the status line + cancel button. */
+    private fun refreshScheduleStatus() {
+        val pending = scheduler.pending()
+        if (pending == null || !CallSchedule.isInFuture(pending.triggerAtMillis, System.currentTimeMillis())) {
+            // Elapsed or none: clear stale state.
+            if (pending != null) scheduler.cancel()
+            binding.scheduleStatusText.text = getString(R.string.schedule_none)
+            binding.cancelScheduleButton.visibility = View.GONE
+            return
+        }
+        val whenText = DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(pending.triggerAtMillis))
+        val dateText = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(pending.triggerAtMillis))
+        binding.scheduleStatusText.text =
+            getString(R.string.schedule_pending, dateText, whenText)
+        binding.cancelScheduleButton.visibility = View.VISIBLE
     }
 }
 
