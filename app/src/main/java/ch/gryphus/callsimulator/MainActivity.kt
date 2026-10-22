@@ -1,6 +1,7 @@
 package ch.gryphus.callsimulator
 
 import android.Manifest
+import android.content.ContentUris
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -140,6 +141,7 @@ class MainActivity : AppCompatActivity() {
                     ContactsContract.Contacts._ID,
                     ContactsContract.Contacts.DISPLAY_NAME,
                     ContactsContract.Contacts.PHOTO_URI,
+                    ContactsContract.Contacts.PHOTO_THUMBNAIL_URI,
                     ContactsContract.Contacts.HAS_PHONE_NUMBER,
                 ),
                 null, null, null
@@ -150,6 +152,8 @@ class MainActivity : AppCompatActivity() {
                 )
                 val rawName = cursor.getStringOrNull(ContactsContract.Contacts.DISPLAY_NAME)
                 val rawPhoto = cursor.getStringOrNull(ContactsContract.Contacts.PHOTO_URI)
+                val rawThumbnail =
+                    cursor.getStringOrNull(ContactsContract.Contacts.PHOTO_THUMBNAIL_URI)
                 val hasPhoneFlag = cursor.getIntOrNull(
                     ContactsContract.Contacts.HAS_PHONE_NUMBER
                 )
@@ -157,12 +161,19 @@ class MainActivity : AppCompatActivity() {
                     if (CallerDetails.hasPhoneNumber(hasPhoneFlag)) queryPrimaryNumber(contactId)
                     else null
 
+                // The full-size "Calling Card" photo (DISPLAY_PHOTO), if the
+                // contact has one and it can actually be opened. Preferred over
+                // the smaller PHOTO_URI for the full-screen caller ID.
+                val displayPhoto = resolveDisplayPhotoUri(contactId)
+
                 // All decisions live in the pure CallerDetails helper (unit-tested).
                 val fields = CallerDetails.fieldsFromContact(
                     displayName = rawName,
                     hasPhoneFlag = hasPhoneFlag,
                     primaryNumber = primaryNumber,
                     rawPhotoUri = rawPhoto,
+                    displayPhotoUri = displayPhoto,
+                    thumbnailUri = rawThumbnail,
                 )
                 fields.name?.let { binding.callerNameEdit.setText(it) }
                 fields.number?.let { binding.callerNumberEdit.setText(it) }
@@ -172,6 +183,26 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(
                 this, getString(R.string.contacts_permission_denied), Toast.LENGTH_LONG
             ).show()
+        }
+    }
+
+    /**
+     * The contact's full-size "Calling Card" display photo URI
+     * (Contacts/<id>/display_photo), or null if the contact has no full-size
+     * photo. We probe that the stream opens so a bad/absent display photo falls
+     * back to PHOTO_URI instead of showing a broken image full-screen.
+     */
+    private fun resolveDisplayPhotoUri(contactId: Long): String? {
+        val uri = Uri.withAppendedPath(
+            ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId),
+            ContactsContract.Contacts.Photo.DISPLAY_PHOTO
+        )
+        return try {
+            contentResolver.openAssetFileDescriptor(uri, "r")?.use { uri.toString() }
+        } catch (e: java.io.IOException) {
+            null
+        } catch (e: SecurityException) {
+            null
         }
     }
 

@@ -115,6 +115,78 @@ class CallerDetailsTest {
         assertEquals("content://p/1", f.photo)
     }
 
+    // --- preferredContactPhoto (Calling Card preference) ------------------
+
+    @Test
+    fun preferredContactPhoto_prefersDisplayPhotoWhenPresent() {
+        // Full-size "Calling Card" wins over PHOTO_URI and thumbnail.
+        assertEquals(
+            "content://display/9",
+            CallerDetails.preferredContactPhoto(
+                displayPhotoUri = "content://display/9",
+                photoUri = "content://photo/9",
+                thumbnailUri = "content://thumb/9",
+            )
+        )
+    }
+
+    @Test
+    fun preferredContactPhoto_fallsBackToPhotoUriWhenNoDisplayPhoto() {
+        assertEquals(
+            "content://photo/9",
+            CallerDetails.preferredContactPhoto(
+                displayPhotoUri = null,
+                photoUri = "content://photo/9",
+                thumbnailUri = "content://thumb/9",
+            )
+        )
+        // Blank display photo is treated as absent.
+        assertEquals(
+            "content://photo/9",
+            CallerDetails.preferredContactPhoto("  ", "content://photo/9", "content://thumb/9")
+        )
+    }
+
+    @Test
+    fun preferredContactPhoto_fallsBackToThumbnailAsLastResort() {
+        assertEquals(
+            "content://thumb/9",
+            CallerDetails.preferredContactPhoto(null, null, "content://thumb/9")
+        )
+    }
+
+    @Test
+    fun preferredContactPhoto_nullWhenNoneSet() {
+        assertNull(CallerDetails.preferredContactPhoto(null, null, null))
+        assertNull(CallerDetails.preferredContactPhoto("", "  ", ""))
+    }
+
+    @Test
+    fun fieldsFromContact_prefersDisplayPhotoForFullScreen() {
+        val f = CallerDetails.fieldsFromContact(
+            displayName = "Frank",
+            hasPhoneFlag = 1,
+            primaryNumber = "555-9",
+            rawPhotoUri = "content://photo/5",
+            displayPhotoUri = "content://display/5",
+            thumbnailUri = "content://thumb/5",
+        )
+        assertEquals("content://display/5", f.photo)
+    }
+
+    @Test
+    fun fieldsFromContact_displayPhotoAbsentUsesPhotoUri() {
+        val f = CallerDetails.fieldsFromContact(
+            displayName = "Grace",
+            hasPhoneFlag = 1,
+            primaryNumber = "555-9",
+            rawPhotoUri = "content://photo/5",
+            displayPhotoUri = null,
+            thumbnailUri = "content://thumb/5",
+        )
+        assertEquals("content://photo/5", f.photo)
+    }
+
     // --- CallerInfo data class --------------------------------------------
 
     @Test

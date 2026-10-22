@@ -39,26 +39,54 @@ object CallerDetails {
     fun hasPhoneNumber(hasPhoneFlag: Int?): Boolean = (hasPhoneFlag ?: 0) > 0
 
     /**
-     * Normalize a raw contact PHOTO_URI value to the string the call screens
+     * Normalize a raw contact photo URI value to the string the call screens
      * expect: a non-blank URI string, or null when absent/blank.
      */
     fun normalizePhoto(rawPhotoUri: String?): String? =
         rawPhotoUri?.trim()?.ifEmpty { null }
 
     /**
+     * Choose the best photo for the FULL-SCREEN caller ID.
+     *
+     * The native dialer shows the large "Calling Card" (full-size display)
+     * photo, not the small circular "Contact picture" thumbnail. Prefer, in
+     * order: the full-size display photo, then the standard display photo
+     * (PHOTO_URI), then the thumbnail (PHOTO_THUMBNAIL_URI). Each candidate is
+     * normalized and the first non-blank one wins; null if none is set.
+     *
+     * @param displayPhotoUri the full-size "calling card" photo (DISPLAY_PHOTO),
+     *   or null if the contact has no full-size photo / it couldn't be opened.
+     * @param photoUri the contact's PHOTO_URI (display photo).
+     * @param thumbnailUri the contact's PHOTO_THUMBNAIL_URI (inset thumbnail).
+     */
+    fun preferredContactPhoto(
+        displayPhotoUri: String?,
+        photoUri: String?,
+        thumbnailUri: String?,
+    ): String? =
+        normalizePhoto(displayPhotoUri)
+            ?: normalizePhoto(photoUri)
+            ?: normalizePhoto(thumbnailUri)
+
+    /**
      * Build the fields to apply to the form from a resolved contact row.
      * Returns only the parts that should overwrite the current form values;
      * null members mean "leave the current value untouched".
+     *
+     * [displayPhotoUri] is the full-size "Calling Card" photo and takes priority
+     * over [rawPhotoUri] (the standard display photo) for the full-screen UI.
      */
     fun fieldsFromContact(
         displayName: String?,
         hasPhoneFlag: Int?,
         primaryNumber: String?,
         rawPhotoUri: String?,
+        displayPhotoUri: String? = null,
+        thumbnailUri: String? = null,
     ): ContactFields = ContactFields(
         name = if (isUsableContactName(displayName)) displayName!!.trim() else null,
         number = if (hasPhoneNumber(hasPhoneFlag)) primaryNumber?.trim()?.ifEmpty { null } else null,
-        photo = normalizePhoto(rawPhotoUri),
+        photo = preferredContactPhoto(displayPhotoUri, rawPhotoUri, thumbnailUri),
     )
 }
 
