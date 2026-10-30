@@ -3,7 +3,7 @@
 # place instead of being hardcoded across build scripts.
 [versions]
 # Plugins
-agp = "9.4.1"
+agp = "9.5.0"
 kotlin = "2.4.21"
 sonarqube = "7.5.0.8588"
 
