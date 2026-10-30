@@ -1,3 +1,4 @@
+import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -35,8 +36,16 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+    // Lint runs in its own JVM and requires that JVM to be >= the project's
+    // target compatibility (now 21). The daemon JDK is irrelevant to this; the
+    // toolchain below makes Lint provision a JDK 21 of its own, so the task
+    // passes even when Gradle itself runs on JDK 17 (GitHub default-setup
+    // CodeQL autobuild does exactly that).
+    lint {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     }
     buildFeatures {
         viewBinding = true
@@ -50,8 +59,19 @@ kotlin {
     // Modern replacement for the deprecated android.kotlinOptions {} DSL
     // (removed/erroring under Kotlin 2.4 + AGP 9).
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_17
+        jvmTarget = JvmTarget.JVM_21
     }
+
+    // Provision a Java 21 toolchain for ALL JVM work (javac, Kotlin, Lint),
+    // independent of whichever JDK runs the Gradle daemon. Locally the daemon
+    // is temurin-21 (mise), but GitHub's default-setup CodeQL autobuild drives
+    // Gradle on its own bundled JDK 17 - a JDK 17 javac cannot emit Java 21
+    // bytecode ("invalid source release: 21"), and Lint refuses to run below
+    // the target version. The toolchain makes Gradle fetch/use a JDK 21 for
+    // those tasks regardless of the daemon, so the build is correct on any
+    // launcher. Auto-provisioning is served by the foojay resolver configured
+    // in settings.gradle.kts.
+    jvmToolchain(21)
 }
 
 dependencies {

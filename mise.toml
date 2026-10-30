@@ -6,9 +6,10 @@
 # here makes mise set JAVA_HOME to a temurin-21 install whenever you enter this
 # directory, so `./gradlew assembleDebug` just works - no exporting JAVA_HOME.
 #
-# Note: this is the build JDK only. The app's bytecode target stays at Java 17
-# (sourceCompatibility / jvmTarget in app/build.gradle.kts) - that's an Android
-# runtime/desugaring concern tied to minSdk, not the JDK running Gradle.
+# The app's bytecode target (sourceCompatibility / jvmTarget in
+# app/build.gradle.kts) is kept in sync with this build JDK at Java 21. AGP 9.5
+# + compileSdk 37 desugar Java 21 class files down to minSdk 26 via D8, so the
+# higher target is safe on-device.
 #
 # Run `mise install` once to provision the JDK, then `mise trust` to allow this
 # config. The Android SDK itself is not managed by mise (it lives at the
