@@ -48,7 +48,7 @@ Simulate realistic incoming and outgoing calls with caller ID, ringtone, vibrati
 
 ## Project structure
 
-```
+```text
 CallSimulator/
 ├── app/
 │   ├── build.gradle.kts          # App-level dependencies & config
