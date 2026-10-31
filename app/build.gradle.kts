@@ -1,5 +1,24 @@
+import com.android.build.api.variant.impl.VariantOutputImpl
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
+// --- Semantic version (single source of truth) ------------------------------
+// MAJOR.MINOR.PATCH, baselined at 1.0.0 and advanced per merged PR using the
+// policy in VERSIONING.md:
+//   feat  -> MINOR     fix/chore/ci/docs/refactor -> PATCH
+//   breaking (feat!/BREAKING CHANGE) -> MAJOR
+//   dependabot: build-tooling/patch/security bump -> PATCH; a shipped-runtime
+//   bump that adds app capability -> MINOR; a breaking runtime bump -> MAJOR.
+// Current value derived from merged PRs #1..#24 (see VERSIONING.md). Bump this
+// line on every release.
+val appVersionName = "1.3.6"
+
+// Monotonic integer derived from the semantic version: MAJOR*10000 +
+// MINOR*100 + PATCH. Always increases as the semver does, keeping Android's
+// install/upgrade check happy.
+val appVersionCode = appVersionName.split(".").let { (maj, min, patch) ->
+    maj.toInt() * 10000 + min.toInt() * 100 + patch.toInt()
+}
 
 plugins {
     alias(libs.plugins.android.application)
@@ -14,8 +33,8 @@ android {
         applicationId = "ch.gryphus.callsimulator"
         minSdk = 26
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -52,6 +71,21 @@ android {
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
+    }
+}
+
+// --- APK naming -------------------------------------------------------------
+// Rename the default "app-<buildType>.apk" to "<project>-<version>-<buildType>.apk"
+// (e.g. CallSimulator-1.3.6-debug.apk / -release.apk) so every artifact
+// self-identifies by app + semantic version. Uses the AGP variant API.
+androidComponents {
+    onVariants { variant ->
+        val baseName = rootProject.name // "CallSimulator"
+        variant.outputs.forEach { output ->
+            (output as? VariantOutputImpl)?.outputFileName?.set(
+                "$baseName-$appVersionName-${variant.buildType}.apk",
+            )
+        }
     }
 }
 
