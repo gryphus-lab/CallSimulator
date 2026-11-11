@@ -61,8 +61,9 @@ Starting from `1.0.0`, each PR merged to `main` (in merge order):
 | #22 | Bump AGP 9.4.1 → 9.5.0 | dep (build) → PATCH | 1.3.4 |
 | #23 | Clean up README files | docs → PATCH | 1.3.5 |
 | #24 | Sync JVM bytecode target 17 → 21 | fix → PATCH | 1.3.6 |
+| #25 | Scheduled call opens full-screen caller UI | fix → PATCH | 1.3.7 |
 
-**Current version: `1.3.6`** (`versionCode 10306`).
+**Current version: `1.3.7`** (`versionCode 10307`).
 
 > Note: #12 (Material Components) is a *shipped-runtime* UI library whose minor
 > bump adds capability, so it's a MINOR. #13 (ConstraintLayout) is a patch bump

@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 //   bump that adds app capability -> MINOR; a breaking runtime bump -> MAJOR.
 // Current value derived from merged PRs #1..#24 (see VERSIONING.md). Bump this
 // line on every release.
-val appVersionName = "1.3.6"
+val appVersionName = "1.3.7"
 
 // Monotonic integer derived from the semantic version: MAJOR*10000 +
 // MINOR*100 + PATCH. Always increases as the semver does, keeping Android's
