@@ -20,7 +20,17 @@ data class ScheduledCall(
     val triggerAtMillis: Long,
 )
 
+/** Unit for relative ("rings in N …") scheduling. */
+enum class DelayUnit(val toMillis: Long) {
+    SECONDS(1_000L),
+    MINUTES(60_000L),
+    HOURS(3_600_000L),
+}
+
 object CallSchedule {
+
+    /** Largest relative amount accepted, to avoid absurd/overflowing delays. */
+    const val MAX_DELAY_AMOUNT = 9_999
 
     /**
      * A schedule is valid only if it fires strictly in the future (with a small
@@ -28,6 +38,19 @@ object CallSchedule {
      */
     fun isInFuture(triggerAtMillis: Long, nowMillis: Long): Boolean =
         triggerAtMillis > nowMillis
+
+    /**
+     * Absolute trigger time for a relative delay of [amount] [unit]s from
+     * [nowMillis]. Returns null for a non-positive or out-of-range amount so the
+     * caller can reject bad input without arming anything. Overflow-safe: the
+     * addition is guarded against Long overflow.
+     */
+    fun triggerFromDelay(nowMillis: Long, amount: Int, unit: DelayUnit): Long? {
+        if (amount <= 0 || amount > MAX_DELAY_AMOUNT) return null
+        val deltaMillis = amount.toLong() * unit.toMillis
+        return if (deltaMillis > Long.MAX_VALUE - nowMillis) Long.MAX_VALUE
+        else nowMillis + deltaMillis
+    }
 
     /**
      * Should a persisted schedule still be armed (e.g. after a reboot)? Only if

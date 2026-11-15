@@ -2,6 +2,7 @@ package ch.gryphus.callsimulator
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -60,5 +61,45 @@ class CallScheduleTest {
         val h = CallSchedule.formatClock24(base, 0)
         val shifted = CallSchedule.formatClock24(base, 24 * 60) // +24h offset = same clock
         assertEquals(h, shifted)
+    }
+
+    // ---- Relative-delay scheduling (triggerFromDelay) ---------------------
+
+    @Test
+    fun `delay adds the right offset per unit`() {
+        assertEquals(now + 30_000L, CallSchedule.triggerFromDelay(now, 30, DelayUnit.SECONDS))
+        assertEquals(now + 5 * 60_000L, CallSchedule.triggerFromDelay(now, 5, DelayUnit.MINUTES))
+        assertEquals(now + 2 * 3_600_000L, CallSchedule.triggerFromDelay(now, 2, DelayUnit.HOURS))
+    }
+
+    @Test
+    fun `delay result is always in the future`() {
+        val trigger = CallSchedule.triggerFromDelay(now, 1, DelayUnit.SECONDS)!!
+        assertTrue(CallSchedule.isInFuture(trigger, now))
+    }
+
+    @Test
+    fun `delay rejects non-positive and out-of-range amounts`() {
+        assertNull(CallSchedule.triggerFromDelay(now, 0, DelayUnit.MINUTES))
+        assertNull(CallSchedule.triggerFromDelay(now, -5, DelayUnit.MINUTES))
+        assertNull(
+            CallSchedule.triggerFromDelay(now, CallSchedule.MAX_DELAY_AMOUNT + 1, DelayUnit.HOURS)
+        )
+    }
+
+    @Test
+    fun `delay accepts the maximum amount`() {
+        val max = CallSchedule.MAX_DELAY_AMOUNT
+        assertEquals(
+            now + max.toLong() * DelayUnit.HOURS.toMillis,
+            CallSchedule.triggerFromDelay(now, max, DelayUnit.HOURS)
+        )
+    }
+
+    @Test
+    fun `delay is overflow-safe near Long max`() {
+        // Should clamp to Long.MAX_VALUE rather than overflow to a negative.
+        val trigger = CallSchedule.triggerFromDelay(Long.MAX_VALUE - 10L, 9_999, DelayUnit.HOURS)!!
+        assertEquals(Long.MAX_VALUE, trigger)
     }
 }

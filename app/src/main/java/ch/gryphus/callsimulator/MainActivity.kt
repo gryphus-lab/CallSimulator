@@ -101,6 +101,7 @@ class MainActivity : AppCompatActivity() {
         binding.startOutgoingButton.setOnClickListener { startOutgoingCall() }
 
         binding.scheduleCallButton.setOnClickListener { pickScheduleDateTime() }
+        binding.scheduleInButton.setOnClickListener { pickScheduleDelay() }
         binding.cancelScheduleButton.setOnClickListener { cancelSchedule() }
     }
 
@@ -330,7 +331,48 @@ class MainActivity : AppCompatActivity() {
                 0
             )
         }
-        val triggerAt = local.timeInMillis
+        armSchedule(local.timeInMillis)
+    }
+
+    /**
+     * Relative-delay scheduling: "ring in N seconds/minutes/hours". A compact
+     * dialog collects the amount + unit, then arms the same alarm path as the
+     * absolute date/time flow.
+     */
+    private fun pickScheduleDelay() {
+        val view = layoutInflater.inflate(R.layout.dialog_schedule_in, null)
+        val amountEdit =
+            view.findViewById<com.google.android.material.textfield.TextInputEditText>(
+                R.id.delayAmountEdit
+            )
+        val unitGroup = view.findViewById<android.widget.RadioGroup>(R.id.delayUnitGroup)
+
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.schedule_in_title)
+            .setView(view)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.schedule_in) { _, _ ->
+                val amount = amountEdit.text?.toString()?.trim()?.toIntOrNull()
+                val unit = when (unitGroup.checkedRadioButtonId) {
+                    R.id.unitSeconds -> DelayUnit.SECONDS
+                    R.id.unitHours -> DelayUnit.HOURS
+                    else -> DelayUnit.MINUTES
+                }
+                val now = System.currentTimeMillis()
+                val triggerAt = amount?.let { CallSchedule.triggerFromDelay(now, it, unit) }
+                if (triggerAt == null) {
+                    Toast.makeText(
+                        this, getString(R.string.schedule_in_invalid), Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    armSchedule(triggerAt)
+                }
+            }
+            .show()
+    }
+
+    /** Shared arming path for both absolute and relative scheduling. */
+    private fun armSchedule(triggerAt: Long) {
         val now = System.currentTimeMillis()
 
         if (!CallSchedule.isInFuture(triggerAt, now)) {
