@@ -191,7 +191,7 @@ class InCallActivity : BaseCallActivity() {
         val types = audioManager
             .getDevices(AudioManager.GET_DEVICES_OUTPUTS)
             .map { it.type }
-        return AudioRoute.isBluetoothOutput(types)
+        return AudioRoute.isBluetoothOutput(types, AudioRoute.bluetoothOutputTypes())
     }
 
     /**
