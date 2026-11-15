@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.media.AudioDeviceCallback
 import android.media.AudioDeviceInfo
 import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -191,7 +192,24 @@ class InCallActivity : BaseCallActivity() {
         val types = audioManager
             .getDevices(AudioManager.GET_DEVICES_OUTPUTS)
             .map { it.type }
-        return AudioRoute.isBluetoothOutput(types, AudioRoute.bluetoothOutputTypes())
+        return AudioRoute.isBluetoothOutput(types, bluetoothOutputTypes())
+    }
+
+    /**
+     * The output device type codes that represent a Bluetooth audio sink on this
+     * device. BLE audio types only exist on API 31+/33+, so they are added
+     * conditionally.
+     */
+    private fun bluetoothOutputTypes(): Set<Int> = buildSet {
+        add(AudioDeviceInfo.TYPE_BLUETOOTH_SCO)   // hands-free / headset profile
+        add(AudioDeviceInfo.TYPE_BLUETOOTH_A2DP)  // stereo media profile
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            add(AudioDeviceInfo.TYPE_BLE_HEADSET)
+            add(AudioDeviceInfo.TYPE_BLE_SPEAKER)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            add(AudioDeviceInfo.TYPE_BLE_BROADCAST)
+        }
     }
 
     /**
