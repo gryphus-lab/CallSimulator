@@ -143,7 +143,7 @@
                 android:id="@+id/speakerButton"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
-                android:src="@drawable/ic_volume"
+                android:src="@drawable/ic_speaker"
                 android:background="@drawable/circle_button_bg"
                 android:contentDescription="@string/speaker"
                 android:scaleType="centerInside"
@@ -151,6 +151,7 @@
                 app:tint="@color/white" />
 
             <TextView
+                android:id="@+id/speakerLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/speaker"

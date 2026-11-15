@@ -7,6 +7,7 @@
     <string name="end_call">End Call</string>
     <string name="mute">Mute</string>
     <string name="speaker">Speaker</string>
+    <string name="bluetooth">Bluetooth</string>
     <string name="keypad">Keypad</string>
     <string name="start_simulation">Start Incoming Call</string>
     <string name="caller_name_hint">Caller Name</string>
@@ -25,6 +26,13 @@
     <string name="schedule_pending">Scheduled: %1$s at %2$s</string>
     <string name="schedule_canceled">Scheduled call canceled.</string>
     <string name="schedule_none">No call scheduled.</string>
+    <string name="schedule_in">Schedule In…</string>
+    <string name="schedule_in_title">Ring after a delay</string>
+    <string name="schedule_in_amount_hint">Amount</string>
+    <string name="schedule_in_invalid">Enter a number between 1 and 9999.</string>
+    <string name="unit_seconds">Seconds</string>
+    <string name="unit_minutes">Minutes</string>
+    <string name="unit_hours">Hours</string>
     <string name="notification_channel_name">Call Simulation</string>
     <string name="notification_channel_desc">Notifications for calls</string>
     <string name="ongoing_channel_name">Ongoing Call</string>

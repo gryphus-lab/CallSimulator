@@ -4,6 +4,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.media.AudioDeviceCallback
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
@@ -40,6 +44,20 @@ class InCallActivity : BaseCallActivity() {
 
     private var service: CallSimulationService? = null
     private var bound = false
+
+    private val audioManager by lazy {
+        getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    }
+
+    // Live audio-route tracking: when a Bluetooth sink connects/disconnects, the
+    // speaker button swaps between the speaker and Bluetooth icon + label.
+    private val audioDeviceCallback = object : AudioDeviceCallback() {
+        override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>?) =
+            refreshAudioRouteIcon()
+
+        override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>?) =
+            refreshAudioRouteIcon()
+    }
 
     override val avatarView: ImageView get() = binding.callerAvatar
     override val photoBackgroundView: ImageView get() = binding.callerPhotoBackground
@@ -119,12 +137,18 @@ class InCallActivity : BaseCallActivity() {
         binding.speakerButton.setOnClickListener {
             isSpeakerOn = !isSpeakerOn
             binding.speakerButton.alpha = if (isSpeakerOn) 0.5f else 1.0f
-            Toast.makeText(
-                this,
-                if (isSpeakerOn) "Speaker on" else "Speaker off",
-                Toast.LENGTH_SHORT
-            ).show()
+            // The on/off toast still reflects the user's speaker toggle; the icon
+            // itself is driven by the actual audio route (see refreshAudioRouteIcon).
+            val label = if (isBluetoothRouted()) {
+                if (isSpeakerOn) "Bluetooth audio on" else "Bluetooth audio off"
+            } else {
+                if (isSpeakerOn) "Speaker on" else "Speaker off"
+            }
+            Toast.makeText(this, label, Toast.LENGTH_SHORT).show()
         }
+
+        // Reflect the current audio route on the speaker button from the outset.
+        refreshAudioRouteIcon()
 
         binding.keypadButton.setOnClickListener {
             Toast.makeText(this, "Keypad (simulated)", Toast.LENGTH_SHORT).show()
@@ -141,6 +165,8 @@ class InCallActivity : BaseCallActivity() {
             connection,
             Context.BIND_AUTO_CREATE
         )
+        // Track audio-route changes while the call screen is visible.
+        audioManager.registerAudioDeviceCallback(audioDeviceCallback, handler)
     }
 
     override fun onResume() {
@@ -148,6 +174,7 @@ class InCallActivity : BaseCallActivity() {
         // Re-entering from the notification/recents: refresh immediately so the
         // duration is correct even before the next tick.
         startTicking()
+        refreshAudioRouteIcon()
     }
 
     override fun onStop() {
@@ -156,7 +183,47 @@ class InCallActivity : BaseCallActivity() {
             unbindService(connection)
             bound = false
         }
+        audioManager.unregisterAudioDeviceCallback(audioDeviceCallback)
         handler.removeCallbacks(tick)
+    }
+
+    /** True if a Bluetooth audio sink is currently among the output devices. */
+    private fun isBluetoothRouted(): Boolean {
+        val types = audioManager
+            .getDevices(AudioManager.GET_DEVICES_OUTPUTS)
+            .map { it.type }
+        return AudioRoute.isBluetoothOutput(types, bluetoothOutputTypes())
+    }
+
+    /**
+     * The output device type codes that represent a Bluetooth audio sink on this
+     * device. BLE audio types only exist on API 31+/33+, so they are added
+     * conditionally.
+     */
+    private fun bluetoothOutputTypes(): Set<Int> = buildSet {
+        add(AudioDeviceInfo.TYPE_BLUETOOTH_SCO)   // hands-free / headset profile
+        add(AudioDeviceInfo.TYPE_BLUETOOTH_A2DP)  // stereo media profile
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            add(AudioDeviceInfo.TYPE_BLE_HEADSET)
+            add(AudioDeviceInfo.TYPE_BLE_SPEAKER)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            add(AudioDeviceInfo.TYPE_BLE_BROADCAST)
+        }
+    }
+
+    /**
+     * Point the speaker control at the audio route: Bluetooth icon + label when
+     * a BT sink is connected, otherwise the built-in speaker icon + label.
+     */
+    private fun refreshAudioRouteIcon() {
+        val bluetooth = isBluetoothRouted()
+        binding.speakerButton.setImageResource(
+            if (bluetooth) R.drawable.ic_bluetooth else R.drawable.ic_speaker
+        )
+        val label = getString(if (bluetooth) R.string.bluetooth else R.string.speaker)
+        binding.speakerButton.contentDescription = label
+        binding.speakerLabel.text = label
     }
 
     private fun startTicking() {
