@@ -24,7 +24,7 @@ buildscript {
             force(
                 "org.bouncycastle:bcprov-jdk18on:1.86",
                 "org.bouncycastle:bcpkix-jdk18on:1.86",
-                "org.bouncycastle:bcutil-jdk18on:1.86",
+                "org.bouncycastle:bcutil-jdk18on:1.87",
                 "org.bitbucket.b_c:jose4j:0.9.7",
                 "org.jdom:jdom2:2.0.6.1",
                 "org.apache.commons:commons-lang3:3.22.0",
