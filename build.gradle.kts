@@ -27,7 +27,7 @@ buildscript {
                 "org.bouncycastle:bcutil-jdk18on:1.86",
                 "org.bitbucket.b_c:jose4j:0.9.7",
                 "org.jdom:jdom2:2.0.6.1",
-                "org.apache.commons:commons-lang3:3.21.0",
+                "org.apache.commons:commons-lang3:3.22.0",
                 "org.apache.httpcomponents:httpclient:4.5.14",
                 "org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.21",
                 "org.jetbrains.kotlin:kotlin-gradle-plugin-api:2.4.21"
