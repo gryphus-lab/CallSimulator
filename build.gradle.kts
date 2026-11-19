@@ -10,8 +10,8 @@
 // supported remediation. CVEs addressed:
 //   bouncycastle 1.86+   (>= 1.85 Name-Constraints bypass + ASN.1 nesting-depth;
 //                          >= 1.84 LDAP injection + risky crypto algorithm;
-//                          bcutil bumped to 1.87 via Dependabot - all forced
-//                          artifacts stay >= the fixed floor)
+//                          bcprov + bcutil bumped to 1.87 via Dependabot - all
+//                          forced artifacts stay >= the fixed floor)
 //   jose4j        0.9.7   (>= 0.9.6 DoS via compressed JWE)
 //   jdom2         2.0.6.1 (XXE injection)
 //   commons-lang3 3.21.0  (>= 3.18.0 uncontrolled recursion)
