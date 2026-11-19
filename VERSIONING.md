@@ -64,8 +64,9 @@ Starting from `1.0.0`, each PR merged to `main` (in merge order):
 | #25 | Scheduled call opens full-screen caller UI | fix → PATCH | 1.3.7 |
 | #26 | Audio-route-aware speaker icon (Speaker/Bluetooth) + relative-delay scheduling | feat → MINOR | 1.4.0 |
 | #27 | Fix mangled end-call icon; redesign launcher as a Phone Call handset | fix → PATCH | 1.4.1 |
+| #28 | Launcher: white background, centred black phone (fix off-centre glyph) | fix → PATCH | 1.4.2 |
 
-**Current version: `1.4.1`** (`versionCode 10401`).
+**Current version: `1.4.2`** (`versionCode 10402`).
 
 > Note: #12 (Material Components) is a *shipped-runtime* UI library whose minor
 > bump adds capability, so it's a MINOR. #13 (ConstraintLayout) is a patch bump
