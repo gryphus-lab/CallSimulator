@@ -65,8 +65,9 @@ Starting from `1.0.0`, each PR merged to `main` (in merge order):
 | #26 | Audio-route-aware speaker icon (Speaker/Bluetooth) + relative-delay scheduling | feat → MINOR | 1.4.0 |
 | #27 | Fix mangled end-call icon; redesign launcher as a Phone Call handset | fix → PATCH | 1.4.1 |
 | #28 | Launcher: white background, centred black phone (fix off-centre glyph) | fix → PATCH | 1.4.2 |
+| #31 | Bump commons-lang3 3.21.0 → 3.22.0 (build-classpath pin) | dep (build) → PATCH | 1.4.3 |
 
-**Current version: `1.4.2`** (`versionCode 10402`).
+**Current version: `1.4.3`** (`versionCode 10403`).
 
 > Note: #12 (Material Components) is a *shipped-runtime* UI library whose minor
 > bump adds capability, so it's a MINOR. #13 (ConstraintLayout) is a patch bump
