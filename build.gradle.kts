@@ -8,8 +8,10 @@
 // clear the Dependabot alerts and keep the toolchain current. AGP 9.4.1 is the
 // latest stable, so bumping AGP is not an option; forcing the transitives is the
 // supported remediation. CVEs addressed:
-//   bouncycastle 1.86    (>= 1.85 Name-Constraints bypass + ASN.1 nesting-depth;
-//                          >= 1.84 LDAP injection + risky crypto algorithm)
+//   bouncycastle 1.86+   (>= 1.85 Name-Constraints bypass + ASN.1 nesting-depth;
+//                          >= 1.84 LDAP injection + risky crypto algorithm;
+//                          bcutil bumped to 1.87 via Dependabot - all forced
+//                          artifacts stay >= the fixed floor)
 //   jose4j        0.9.7   (>= 0.9.6 DoS via compressed JWE)
 //   jdom2         2.0.6.1 (XXE injection)
 //   commons-lang3 3.21.0  (>= 3.18.0 uncontrolled recursion)
@@ -24,7 +26,7 @@ buildscript {
             force(
                 "org.bouncycastle:bcprov-jdk18on:1.86",
                 "org.bouncycastle:bcpkix-jdk18on:1.86",
-                "org.bouncycastle:bcutil-jdk18on:1.86",
+                "org.bouncycastle:bcutil-jdk18on:1.87",
                 "org.bitbucket.b_c:jose4j:0.9.7",
                 "org.jdom:jdom2:2.0.6.1",
                 "org.apache.commons:commons-lang3:3.22.0",
