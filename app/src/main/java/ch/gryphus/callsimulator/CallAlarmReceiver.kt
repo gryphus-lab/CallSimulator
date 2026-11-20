@@ -13,20 +13,28 @@ import androidx.core.content.ContextCompat
  * Two things happen on fire:
  *
  * 1. The incoming-call foreground service ([CallSimulationService] with
- *    [ACTION_INCOMING]) is started. It owns the call lifecycle, posts the
- *    high-priority full-screen-intent notification, and provides the
- *    background-survival + lock-screen path (the FSI promotes itself to full
- *    screen when the device is locked or the screen is off).
+ *    [ACTION_INCOMING]) is started. It owns the call lifecycle and posts the
+ *    high-priority full-screen-intent (FSI) notification. This is the
+ *    OS-sanctioned LOCK-SCREEN path: when the device is locked or the screen is
+ *    off, the FSI promotes itself to the full-screen caller UI - PROVIDED the
+ *    app currently holds full-screen-intent access. On Android 14+ that access
+ *    is a user-revocable special permission (canUseFullScreenIntent()); if it is
+ *    not granted the system silently demotes the FSI to a shade/heads-up
+ *    notification (the "it only shows in the notification bar on the lock
+ *    screen" symptom). MainActivity requests that access up front so this path
+ *    works. There is nothing more the receiver can do at fire time to force a
+ *    full-screen takeover over the keyguard - the FSI grant is the mechanism.
  *
- * 2. [IncomingCallActivity] is launched directly. This is the key to the
- *    "full screen by default" behaviour: when the device is unlocked with the
- *    screen on and the app is in the background, Android 10+ demotes a
- *    full-screen-intent notification to a heads-up banner ("the bar on top").
- *    Because the schedule is armed with `AlarmManager.setAlarmClock()`, the app
- *    receives a temporary background-activity-launch allowance when the alarm
- *    fires, so starting the activity here is permitted and reliably shows the
- *    caller full screen. The activity is single-instance, so this never
- *    double-stacks with the notification's full-screen intent.
+ * 2. [IncomingCallActivity] is launched directly. This covers the
+ *    screen-on + unlocked case, where Android would otherwise demote the FSI to
+ *    a heads-up banner. Because the schedule is armed with
+ *    `AlarmManager.setAlarmClock()`, the app receives a temporary
+ *    background-activity-launch allowance when the alarm fires, so starting the
+ *    activity here is permitted. On a locked device this direct start may be
+ *    blocked by background-activity-launch / keyguard rules - that is fine and
+ *    expected: path 1's FSI is what brings up the caller over the lock screen,
+ *    so the direct start is best-effort and its failure is caught. The activity
+ *    is single-instance, so the two paths never double-stack.
  */
 class CallAlarmReceiver : BroadcastReceiver() {
 
