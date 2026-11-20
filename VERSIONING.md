@@ -69,8 +69,9 @@ Starting from `1.0.0`, each PR merged to `main` (in merge order):
 | #32 | Bump gradle-wrapper 9.9.0 → 9.9.1 | dep (build) → PATCH | 1.4.4 |
 | #33 | Bump bcutil-jdk18on 1.86 → 1.87 (build-classpath pin) | dep (build) → PATCH | 1.4.5 |
 | #35 | Bump bcprov-jdk18on 1.86 → 1.87 (build-classpath pin) | dep (build) → PATCH | 1.4.6 |
+| #37 | Request Android 14+ full-screen-intent access so a scheduled call takes over the lock screen (was demoted to a notification) | fix → PATCH | 1.4.7 |
 
-**Current version: `1.4.6`** (`versionCode 10406`).
+**Current version: `1.4.7`** (`versionCode 10407`).
 
 > #34 (sonarqube 7.5 → 7.6) was closed, not merged: `7.6.0.18749` was already on
 > `main` via #36, so its diff was empty.

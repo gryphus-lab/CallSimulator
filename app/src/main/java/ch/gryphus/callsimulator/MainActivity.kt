@@ -1,6 +1,7 @@
 package ch.gryphus.callsimulator
 
 import android.Manifest
+import android.app.NotificationManager
 import android.content.ContentUris
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -8,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
@@ -120,6 +122,36 @@ class MainActivity : AppCompatActivity() {
         }
         if (permissions.isNotEmpty()) {
             requestPermissionLauncher.launch(permissions.toTypedArray())
+        }
+
+        ensureFullScreenIntentAccess()
+    }
+
+    /**
+     * On Android 14+ the full-screen-intent permission is a user-revocable
+     * special access. Without it, a scheduled call arriving on a LOCKED screen is
+     * silently demoted from the full-screen caller UI to a mere shade / heads-up
+     * notification (the reported "it only shows in the notification bar" bug). If
+     * access is not currently granted, send the user once to the system settings
+     * screen that toggles it. Below API 34 the permission is implicit, so this is
+     * a no-op (decided by the unit-tested [FullScreenIntentAccess] helper).
+     */
+    private fun ensureFullScreenIntentAccess() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
+
+        val canUse = getSystemService(NotificationManager::class.java)
+            ?.canUseFullScreenIntent() ?: true
+        if (!FullScreenIntentAccess.shouldRequestAccess(Build.VERSION.SDK_INT, canUse)) return
+
+        val intent = Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)
+            .setData(Uri.fromParts("package", packageName, null))
+        val launched = runCatching { startActivity(intent); true }.getOrDefault(false)
+        if (!launched) {
+            Toast.makeText(
+                this,
+                getString(R.string.fsi_permission_hint),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
